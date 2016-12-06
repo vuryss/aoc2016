@@ -2,15 +2,12 @@
 
 $input = '--input--';
 
-$inputRows  = explode("\n", $input);
-$characters = [];
+$characters = array_map('str_split', explode("\n", $input));
+$word = '';
 
-foreach ($inputRows as $row)
-    foreach (str_split($row) as $index => $character)
-        $characters[$index][$character] = ($characters[$index][$character] ?? 0) + 1;
+for ($i = 0, $len = count($characters[0]); $i < $len; $i++) {
+    $charCount = array_count_values(array_column($characters, $i));
+    $word .= array_search(max($charCount), $charCount);
+}
 
-array_walk($characters, 'arsort');
-$characters = array_map('array_flip', $characters);
-$characters = array_map('reset', $characters);
-
-echo implode('', $characters);
+echo $word;
