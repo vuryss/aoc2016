@@ -3,7 +3,6 @@
 $input = '--input--';
 
 $inputRows  = explode("\n", $input);
-$mLength    = strlen($inputRows[0]);
 $characters = [];
 
 foreach ($inputRows as $row)
