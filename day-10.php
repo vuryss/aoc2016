@@ -3,39 +3,23 @@
 $input = '--input--';
 
 $input = explode("\n", $input);
-$bot = $instr = $output = [];
+$bot = $instr = $output = $values = [];
+$id = 0;
 
-// Get bot initial values and instructions
-foreach ($input as $k => $row) {
-    if (preg_match('/^value\s(\d+)\sgoes\sto\sbot\s(\d+)$/', $row, $matches)) {
-        $bot[$matches[2]][] = $matches[1];
-    }
-    elseif (preg_match('/bot\s(\d+)\sgives\slow\sto\s(bot|output)\s(\d+)\sand\shigh\sto\s(bot|output)\s(\d+)$/', $row, $matches)) {
-        $instr[$matches[1]] = ['min' => $matches[2] . '.' . $matches[3], 'max' => $matches[4] . '.' . $matches[5]];
-    }
-}
+foreach ($input as $k => $row)
+       (preg_match('/^v.*?(\d+).*?(\d+)$/', $row, $m) && $bot[$m[2]][] = $m[1])
+    || (preg_match('/^b.*?(\d+).*?(bot|output)\s(\d+).*?(bot|output)\s(\d+)$/', $row, $m) && $instr[$m[1]] = ['min' => $m[2] . '.' . $m[3], 'max' => $m[4] . '.' . $m[5]]);
 
-// Process instructions
-while (($id = getActiveBot()) !== NULL && ($instruction = $instr[$id])) {
-    if (in_array(61, $bot[$id]) && in_array(17, $bot[$id]))
-        echo 'BOT ID: ' . $id . PHP_EOL;
+while (true) {
+    foreach ($bot as $id => $values) if (count($values) == 2) break;
+    if (count($values) != 2) break;
 
-    foreach ($instruction as $fn => $target) {
-        list($target, $number) = explode('.', $target);
-        ${$target}[$number][] = $fn($bot[$id]);
-    }
+    if (in_array(61, $bot[$id]) && in_array(17, $bot[$id])) echo 'BOT ID: ' . $id . PHP_EOL;
+
+    foreach ($instr[$id] as $fn => $target)
+        (list($target, $number) = explode('.', $target)) && ${$target}[$number][] = $fn($bot[$id]);
 
     $bot[$id] = [];
 }
 
-echo 'Multiplication: ' . ($output[0][0] * $output[1][0] * $output[2][0]) . PHP_EOL;
-
-// Get active BOT
-function getActiveBot() {
-    global $bot;
-
-    foreach ($bot as $id => $values)
-        if (count($values) == 2) return $id;
-
-    return NULL;
-}
+echo 'Product: ' . ($output[0][0] * $output[1][0] * $output[2][0]) . PHP_EOL;
