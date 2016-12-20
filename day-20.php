@@ -9,11 +9,9 @@ foreach (explode("\n", $input) as $range) list($begin[], $end[]) = explode('-', 
 
 array_multisort($begin, SORT_ASC, $end);
 
-for ($i = 0, $j = 1, $len = count($begin) - 1; $i < $len; $i++, $j = 1) {
-    while (isset($begin[$i + $j]) && $end[$i] >= $begin[$i + $j] - 1) {
+for ($i = 0, $j = 0, $len = count($begin) - 1; $i < $len; $i++, $j = 0) {
+    while (++$j && isset($begin[$i + $j]) && $end[$i] >= $begin[$i + $j] - 1)
         if ($end[$i + $j] > $end[$i]) $end[$i] = $end[$i + $j];
-        unset($begin[$i + $j], $end[$i + $j++]);
-    }
     $banned += $end[$i] - $begin[$i] + 1;
     $i += $j - 1;
 }
